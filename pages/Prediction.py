@@ -26,7 +26,7 @@ register_page(
 )
 ####################### DATASET #############################
 # Load the model from the file
-loaded_model = joblib.load("random_forest_model fixed with sc.joblib")
+loaded_model = joblib.load("Hasil RFR.joblib")
 
 ####################### PAGE LAYOUT #############################
 # Updated layout with dropdown options based on one-hot encoding

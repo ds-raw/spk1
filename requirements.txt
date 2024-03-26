@@ -17,6 +17,4 @@ gunicorn==21.2.0
 numpy==1.25.2
 packaging==21.3
 pandas==2.2.0
-scikit-base==0.5.2
-scikit-learn==1.4.0
 scipy==1.12.0

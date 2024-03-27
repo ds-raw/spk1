@@ -1,9 +1,9 @@
-from dash import html, register_page,dash_table
+from dash import html, register_page, dash_table
 import pandas as pd 
 from dash import dcc, html, callback
 import plotly.express as px
 import dash_bootstrap_components as dbc
-from dash.dependencies import Input, Output #, callback # If you need callbacks, import it here.
+from dash.dependencies import Input, Output # If you need callbacks, import it here.
 
 register_page(
     __name__,
@@ -13,12 +13,12 @@ register_page(
 )
 
 # Load dataset
-df = pd.read_excel("JawaBarat.xlsx")
+df = pd.read_excel("data aws.xlsx")
 # Distribution chart function
 # set average score and row id
 df['Provinsi'] = df.index
 avg_lt = round(df['LT (m2)'].mean(), 2)
-avg_hpm = round(df['HPM'].mean(), 2)
+avg_hpm = round(df['Harga Tanah (m2)'].mean(), 2)
 avg_distance = round(df['distance_ke_pusatkota'].mean(), 2)
 # create reusable card component
 def get_card_component(title, data):
@@ -59,14 +59,14 @@ layout = html.Div([
             html.H4("Distribusi Data Numerikal"),
             html.Div(
                 dbc.RadioItems(
-                    id="score-distribution-radios",
+                    id="numerical-radios",
                     className="btn-group",
                     inputClassName="btn-check",
                     labelClassName="btn btn-outline-dark",
                     labelCheckedClassName="active",
                     options=[
                         {'label': 'Luas Tanah', 'value': 'LT (m2)'},
-                        {'label': 'Harga Per Meter', 'value': 'HPM'},
+                        {'label': 'Harga Per Meter', 'value': 'Harga Tanah (m2)'},
                         {'label': 'Jarak Pusat Kota', 'value': 'distance_ke_pusatkota'},
                         ],
                     value='LT (m2)',
@@ -74,19 +74,19 @@ layout = html.Div([
                 className ="radio-group",
                 style = {'margin-top': '20px'}
             ),
-            dcc.Graph(figure={}, id="score-distribution-histogram")
+            dcc.Graph(figure={}, id="distribution-numerical-histogram")
         ])
     ),
     dbc.Row([
         html.H4("Each Score Relationship"),
         dbc.Col(
-            dcc.Graph(figure=px.scatter(df, x="LT (m2)", y="HPM", color_discrete_sequence=['#94d2bd'])),
+            dcc.Graph(figure=px.scatter(df, x="LT (m2)", y="Harga Tanah (m2)", color_discrete_sequence=['#94d2bd'])),
         ),
         dbc.Col(
             dcc.Graph(figure=px.scatter(df, x="distance_ke_pusatkota", y="LT (m2)", color_discrete_sequence=['#e9d8a6'])),
         ),
         dbc.Col(
-            dcc.Graph(figure=px.scatter(df, x="HPM", y="distance_ke_pusatkota", color_discrete_sequence=['#ee9b00'])),
+            dcc.Graph(figure=px.scatter(df, x="Harga Tanah (m2)", y="distance_ke_pusatkota", color_discrete_sequence=['#ee9b00'])),
         )
     ]),
     dbc.Row(
@@ -94,7 +94,7 @@ layout = html.Div([
             html.H4("Explore Categorical Data"),
             html.Div(
                 dbc.RadioItems(
-                    id="student-categorical-radios",
+                    id="categorical-radios",
                     className="btn-group",
                     inputClassName="btn-check",
                     labelClassName="btn btn-outline-dark",
@@ -103,49 +103,55 @@ layout = html.Div([
                         {'label': 'Peruntukan', 'value': 'Peruntukan'},
                         {'label': 'Kondisi Wilayah Sekitar', 'value': 'Kondisi Wilayah Sekitar'},
                         {'label': 'Kota/Kabupaten', 'value': 'Kota/Kabupaten'},
-                        {'label': 'Kualitas Wilayah Sekitar', 'value': 'Kualitas Wilayah Sekitar'},
+                        {'label': 'Air', 'value': 'Air_Label'},
+                        {'label': 'Listrik', 'value': 'Listrik_Label'},
                     ],
                     value='Peruntukan',
                 ),
                 className ="radio-group",
                 style = {'margin-top': '20px'}
             ),
-            dcc.Graph(figure={}, id="student-categorical-summary"),
+            dcc.Graph(figure={}, id="categorical-summary"),
             dbc.Row([
-                dbc.Col(dcc.Graph(figure={}, id="student-categorical-math-score-distribution")),
-                dbc.Col(dcc.Graph(figure={}, id="student-categorical-writing-score-distribution")),
-                dbc.Col(dcc.Graph(figure={}, id="student-categorical-reading-score-distribution")),
+                dbc.Col(dcc.Graph(figure={}, id="peruntukan-distribution")),
+                dbc.Col(dcc.Graph(figure={}, id="kws-distribution")),
+                dbc.Col(dcc.Graph(figure={}, id="kota-kabupaten-distribution")),
+                dbc.Col(dcc.Graph(figure={}, id="air-distribution")),
+                dbc.Col(dcc.Graph(figure={}, id="listrik-distribution")),
             ]),
         ])
     ),
 ])
+
+# Callback to update the histogram based on selected numerical column
 @callback(
-    Output("score-distribution-histogram", "figure"),
-    [Input("score-distribution-radios", "value")]
+    Output("distribution-numerical-histogram", "figure"),
+    [Input("numerical-radios", "value")]
 )
 def update_histogram(selected_column):
-    # Create histogram based on the selected column
     fig = px.histogram(df, x=selected_column, color_discrete_sequence=color_discrete_sequence)
     fig.update_layout(title=f"Distribution of {selected_column}", xaxis_title=selected_column, yaxis_title="Count")
     return fig
 
 @callback(
-    Output("student-categorical-summary", "figure"),
-    Output("student-categorical-math-score-distribution", "figure"),
-    Output("student-categorical-writing-score-distribution", "figure"),
-    Output("student-categorical-reading-score-distribution", "figure"),
-    [Input("student-categorical-radios", "value")]
+    Output("categorical-summary", "figure"),
+    Output("peruntukan-distribution", "figure"),
+    Output("kws-distribution", "figure"),
+    Output("kota-kabupaten-distribution", "figure"),
+    Output("air-distribution", "figure"),
+    Output("listrik-distribution", "figure"),
+    [Input("categorical-radios", "value")]
 )
-def update_categorical_component(value):
-    grouped_df = pd.DataFrame({'count': df.groupby([value]).size()}).reset_index()
-    figure = px.bar(grouped_df, x=value, y='count', color=value, color_discrete_sequence=color_discrete_sequence, title='Summary')
+def update_categorical_component(selected_column):
+    grouped_df = pd.DataFrame({'count': df.groupby([selected_column]).size()}).reset_index()
+    figure = px.bar(grouped_df, x=selected_column, y='count', color=selected_column, color_discrete_sequence=color_discrete_sequence, title='Summary')
 
-    HPM_figure = px.box(df, x=value, y="HPM", color_discrete_sequence=['#0a9396'], title='HPM Distribution')
-    LT_figure = px.box(df, x=value, y="LT (m2)", color_discrete_sequence=['#ee9b00'], title='LT (m2) Distribution')
-    kota_figure = px.box(df, x=value, y="distance_ke_pusatkota", color_discrete_sequence=['#bb3e03'],
-                         title='distance_ke_pusatkota Distribution')
+    peruntukan_distribution = px.box(df, x=selected_column, y="Harga Tanah (m2)", color_discrete_sequence=['#0a9396'], title='Peruntukan Distribution')
+    kws_distribution = px.box(df, x=selected_column, y="LT (m2)", color_discrete_sequence=['#ee9b00'], title='Kondisi Wilayah Sekitar Distribution')
+    kota_kabupaten_distribution = px.box(df, x=selected_column, y="distance_ke_pusatkota", color_discrete_sequence=['#bb3e03'], title='Kota/Kabupaten Distribution')
+    air_distribution = px.box(df, x=selected_column, y="Air_Label", color_discrete_sequence=['#ca6702'], title='Air Distribution')
+    listrik_distribution = px.box(df, x=selected_column, y="Listrik_Label", color_discrete_sequence=['#ae2012'], title='Listrik Distribution')
 
-    return figure, HPM_figure, LT_figure, kota_figure
-
+    return figure, peruntukan_distribution, kws_distribution, kota_kabupaten_distribution, air_distribution, listrik_distribution
 
 

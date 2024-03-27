@@ -310,8 +310,10 @@ def make_predictions(model, new_data):
 
     # Make predictions using the loaded model
     prediction = model.predict([input_data])
+    # Format the prediction with commas between numbers
+    formatted_prediction = "{:,.2f} Juta Rupiah".format(prediction[0])
 
-    return prediction[0]
+    return formatted_prediction
 
 
 

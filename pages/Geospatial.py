@@ -16,7 +16,7 @@ register_page(
     path='/Geospatial'
 )
 # DATASET
-df = pd.read_excel("JawaBarat.xlsx")
+df = pd.read_excel("data aws.xlsx")
 
 # MAPBOX CHART FUNCTION
 def create_map_chart():

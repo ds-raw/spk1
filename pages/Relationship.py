@@ -16,17 +16,17 @@ register_page(
     path='/Relationship'
 )
 ####################### DATASET #############################
-df = pd.read_excel("JawaBarat.xlsx")
+df = pd.read_excel("data aws.xlsx")
 
 ####################### SCATTER CHART #############################
 def create_scatter_chart(x_axis="Peruntukan", y_axis="LT (m2)", color_axis="Clusters"):
     return px.scatter(data_frame=df, x=x_axis, y=y_axis, color=color_axis,height=600)
 
 ####################### WIDGETS #############################
-columns = ["LT (m2)","Kondisi Wilayah Sekitar", "HPM Transform","distance_ke_pusatkota Transform","HPM","distance_ke_pusatkota","Peruntukan", "Kota/Kabupaten","Clusters","Hak Atas Properti","HPM"]
+columns = ["LT (m2)","Kondisi Wilayah Sekitar", "Harga Tanah (m2)","distance_ke_pusatkota","Air","Listrik","distance_ke_pusatkota","Peruntukan", "Kota/Kabupaten","Clusters","Hak Atas Properti"]
 
-x_axis = dcc.Dropdown(id="x_axis", options=columns, value="HPM Transform", clearable=False)
-y_axis = dcc.Dropdown(id="y_axis", options=columns, value="distance_ke_pusatkota Transform", clearable=False)
+x_axis = dcc.Dropdown(id="x_axis", options=columns, value="Harga Tanah (m2)", clearable=False)
+y_axis = dcc.Dropdown(id="y_axis", options=columns, value="distance_ke_pusatkota", clearable=False)
 
 ####################### PAGE LAYOUT #############################
 layout = html.Div(children=[

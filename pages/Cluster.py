@@ -16,7 +16,7 @@ register_page(
     path='/Cluster'
 )
 ####################### DATASET #############################
-df = pd.read_excel("data aws.xlsx")
+df = pd.read_excel("New Model 3_Clusters.xlsx")
 
 ####################### BAR CHART #############################
 def create_bar_chart(col_name="Peruntukan"):

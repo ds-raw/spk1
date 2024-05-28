@@ -14,21 +14,21 @@ def layout():
             {
                 "key": "1",
                 "src": "/assets/jb.jpg",
-                "header": "Auto Valuation Model",
+                "header": "Automated Valuation Model",
                 "caption": "Sistem Pendukung Keputusan di Jawa Barat",
                 "img_style": {"width": "100%", "height": "500px"}
             },
             {
                 "key": "2",
                 "src": "/assets/jb2.jpg",
-                "header": "Auto Valuation Model",
+                "header": "Automated Valuation Model",
                 "caption": "Sistem Pendukung Keputusan di Jawa Barat",
                 "img_style": {"width": "100%", "height": "500px"}
             },
             {
                 "key": "3",
                 "src": "/assets/jb3.jpg",
-                "header": "Auto Valuation Model",
+                "header": "Automated Valuation Model",
                 "caption": "Sistem Pendukung Keputusan di Jawa Barat",
                 "img_style": {"width": "100%", "height": "500px"}
             },
@@ -42,7 +42,7 @@ def layout():
     layout = html.Div(children=[
         dbc.Card(
             dbc.CardBody([
-                html.H2("Rekapitulasi Clustering dan Prediksi Lahan Tanah Kosong Di Jawa Barat"),
+                html.H2("Automated Valuation Model"),
                 carousel,
                 html.P(
                     "Selamat datang di beranda kami! Temukan informasi terkini tentang lahan kosong di Jawa Barat. "

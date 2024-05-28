@@ -1,10 +1,10 @@
-from dash import html, register_page, dash_table
+from dash import dcc, html, callback, register_page, dash_table
 import pandas as pd 
-from dash import dcc, html, callback
 import plotly.express as px
 import dash_bootstrap_components as dbc
-from dash.dependencies import Input, Output # If you need callbacks, import it here.
+from dash.dependencies import Input, Output
 
+# Register the page
 register_page(
     __name__,
     name='Distribution',
@@ -13,7 +13,7 @@ register_page(
 )
 
 # Load dataset
-df = pd.read_excel("data aws.xlsx")
+df = pd.read_excel("New Model 3_Clusters.xlsx")
 # Distribution chart function
 # set average score and row id
 df['Provinsi'] = df.index
@@ -153,5 +153,3 @@ def update_categorical_component(selected_column):
     listrik_distribution = px.box(df, x=selected_column, y="Listrik_Label", color_discrete_sequence=['#ae2012'], title='Listrik Distribution')
 
     return figure, peruntukan_distribution, kws_distribution, kota_kabupaten_distribution, air_distribution, listrik_distribution
-
-

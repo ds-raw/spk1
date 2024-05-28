@@ -14,22 +14,22 @@ def layout():
             {
                 "key": "1",
                 "src": "/assets/jb.jpg",
-                "header": "With header ",
-                "caption": "and caption",
+                "header": "Auto Valuation Model",
+                "caption": "Sistem Pendukung Keputusan di Jawa Barat",
                 "img_style": {"width": "100%", "height": "500px"}
             },
             {
                 "key": "2",
                 "src": "/assets/jb2.jpg",
-                "header": "With header only",
-                "caption": "",
+                "header": "Auto Valuation Model",
+                "caption": "Sistem Pendukung Keputusan di Jawa Barat",
                 "img_style": {"width": "100%", "height": "500px"}
             },
             {
                 "key": "3",
                 "src": "/assets/jb3.jpg",
-                "header": "",
-                "caption": "This slide has a caption only",
+                "header": "Auto Valuation Model",
+                "caption": "Sistem Pendukung Keputusan di Jawa Barat",
                 "img_style": {"width": "100%", "height": "500px"}
             },
         ],

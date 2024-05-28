@@ -13,7 +13,7 @@ register_page(
 )
 
 # Load dataset
-df = pd.read_excel("data aws.xlsx")
+df = pd.read_excel("New Model 3_Clusters.xlsx")
 
 
 def layout():

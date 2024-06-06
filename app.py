@@ -15,7 +15,7 @@ import webbrowser
 NAVBAR = create_navbar()
 # To use Font Awesome Icons
 FA621 = "https://use.fontawesome.com/releases/v6.2.1/css/all.css"
-APP_TITLE = "First Dash App"
+APP_TITLE = "AVM"
 
 app = dash.Dash(
     __name__,

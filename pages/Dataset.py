@@ -13,7 +13,7 @@ register_page(
 )
 
 # Load dataset
-df = pd.read_excel("New Model 3_Clusters.xlsx")
+df = pd.read_excel("New Model 6_Clusters.xlsx")
 
 
 def layout():

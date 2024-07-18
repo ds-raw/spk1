@@ -5,26 +5,23 @@ Created on Fri May 31 23:51:15 2024
 @author: daffa
 """
 
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Feb  6 23:20:03 2024
-
-@author: daffa
-"""
-from dash import html, register_page, dcc, callback
+from dash import html, register_page, dcc, callback, no_update
 import pandas as pd
 import plotly.express as px
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 import dash_bootstrap_components as dbc
-import dash
-from dash import dcc, html, Input, Output, State
 from geopy.distance import geodesic
+import requests
+
 register_page(
     __name__,
     name='Finding Data Points',
     top_nav=True,
     path='/Find_Data_Points'
 )
+
+# Google API Key
+GOOGLE_API_KEY = 'AIzaSyC9W2ibg41qCiyCyhkpuI4aZBxIDez0w68'  # Replace with your Google API key
 
 # DATASET
 try:
@@ -35,7 +32,6 @@ except Exception as e:
 
 # Create a single 'Clusters' column if not exists
 if 'Clusters' not in df.columns:
-    # Assuming Clusters_0, Clusters_1, and Clusters_2 are mutually exclusive, create 'Clusters' column
     df['Clusters'] = df[['Clusters_0', 'Clusters_1', 'Clusters_2']].idxmax(axis=1)
 
 # Category mapping of cities to coordinates
@@ -69,12 +65,39 @@ def find_city_and_distance(new_house):
             closest_city = city
     return closest_city, min_distance
 
+# Function to convert address to latitude and longitude using Google Geocoding API
+def address_to_coordinates_google(address, api_key):
+    base_url = "https://maps.googleapis.com/maps/api/geocode/json"
+    params = {
+        "address": address,
+        "key": api_key
+    }
+    response = requests.get(base_url, params=params)
+    if response.status_code == 200:
+        results = response.json().get("results")
+        if results:
+            location = results[0]["geometry"]["location"]
+            return location["lat"], location["lng"]
+    return None, None
 
 layout = dbc.Container([
     dbc.Row([
         dbc.Col([
             html.H1("Find Closest Data Points"),
             dbc.Form([
+                dbc.Row([
+                    dbc.Col([
+                        dbc.Label("Address:"),
+                        dbc.Input(id="input-address", type="text", placeholder="Enter address")
+                    ]),
+                    
+                ], className="mb-3"),
+                dbc.Row([
+                    dbc.Col([
+                        dbc.Button("Convert Address", id="address-button", color="primary", className="mr-2")
+                    ])
+                ])
+               ,
                 dbc.Row([
                     dbc.Col([
                         dbc.Label("Latitude:"),
@@ -100,6 +123,18 @@ layout = dbc.Container([
         ])
     ])
 ])
+
+@callback(
+    Output("input-latitude", "value"),
+    Output("input-longitude", "value"),
+    Input("address-button", "n_clicks"),
+    State("input-address", "value")
+)
+def update_coordinates(n_clicks, address):
+    if n_clicks is None or not address:
+        return no_update, no_update
+    latitude, longitude = address_to_coordinates_google(address, GOOGLE_API_KEY)
+    return latitude, longitude
 
 @callback(
     [Output("output-table", "children"),
@@ -160,10 +195,14 @@ def update_output(n_clicks, latitude, longitude):
     fig.update_layout(mapbox_style="carto-positron")
     
     # Add trace for inputted data point
-    fig.add_trace(px.scatter_mapbox(pd.DataFrame({'latitude': [latitude], 'longitude': [longitude]}),
-                                    lat="latitude", lon="longitude",
-                                    text=["Inputted Data Point"]).data[0])
+    fig.add_trace(px.scatter_mapbox(pd.DataFrame({'latitude': [latitude], 'longitude': [longitude]}), 
+                                    lat="latitude", lon="longitude").update_traces(marker=dict(color="red"), name="Input Location").data[0])
     
-    distance_info = f"Input Coordinates: (Latitude: {latitude}, Longitude: {longitude}), Closest City: {closest_city}, Distance to City Center: {round(city_distance, 2)} km"
+    # Attractive distance info using Bootstrap alert
+    distance_info = dbc.Alert(
+        f"The closest city is {closest_city}, which is {round(city_distance, 2)} km away.",
+        color="info",
+        style={"fontSize": "16px", "fontWeight": "bold", "textAlign": "center"}
+    )
     
-    return dbc.Table(table_header + table_body, bordered=True, hover=True, responsive=True), fig, distance_info
+    return dbc.Table(table_header + table_body, bordered=True, dark=True, hover=True, responsive=True, striped=True), fig, distance_info

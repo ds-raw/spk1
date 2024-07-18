@@ -85,4 +85,4 @@ def update_cluster_profile(pathname):
     # Create bar graph for numerical columns only
     fig = px.bar(cluster_means, x='Clusters', y=numerical_columns, barmode='group', title="Mean Values per Cluster")
     
-    return dbc.Table(table_header + table_body, bordered=True, hover=True, responsive=True), fig
+    return dbc.Table(table_header + table_body, bordered=True, hover=True, responsive=True,dark=True), fig

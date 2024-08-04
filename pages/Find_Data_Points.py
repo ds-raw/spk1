@@ -156,7 +156,8 @@ def update_output(n_clicks, latitude, longitude):
     
     # Find the closest city and distance to it
     closest_city, city_distance = find_city_and_distance(new_house)
-    
+    # Format 'Harga Tanah (m2)' with commas
+    closest_data_points['Harga Tanah (m2)'] = closest_data_points['Harga Tanah (m2)'].apply(lambda x: f"{x:,.2f}")
     table_header = [html.Thead(html.Tr([
         html.Th("Latitude"), 
         html.Th("Longitude"), 

@@ -42,14 +42,34 @@ numerical_columns = ['LT (m2)', 'Harga Tanah (m2)', 'Lebar Jalan Depan (m)', 'di
 categorical_columns = ['Peruntukan', 'Kondisi Wilayah Sekitar']
 columns_to_display = ['Clusters'] + numerical_columns + categorical_columns
 
-# Calculate mean values for numerical columns
-numerical_means = df.groupby('Clusters')[numerical_columns].mean().reset_index()
+# Calculate mean values for numerical columns except 'Harga Tanah (m2)'
+numerical_means = df.groupby('Clusters')[['LT (m2)', 'Lebar Jalan Depan (m)', 'distance_ke_pusatkota']].mean().reset_index()
+
+# Format the numerical columns with commas and 2 decimal places
+for col in ['LT (m2)', 'Lebar Jalan Depan (m)', 'distance_ke_pusatkota']:
+    numerical_means[col] = numerical_means[col].apply(lambda x: f"{x:,.2f}")
+
+# Calculate min and max values for 'Harga Tanah (m2)'
+harga_tanah_min = df.groupby('Clusters')['Harga Tanah (m2)'].min().reset_index()
+harga_tanah_max = df.groupby('Clusters')['Harga Tanah (m2)'].max().reset_index()
+
+# Combine min and max values into a range string for 'Harga Tanah (m2)'
+harga_tanah_range = harga_tanah_min.copy()
+harga_tanah_range['Harga Tanah (m2)'] = harga_tanah_min['Harga Tanah (m2)'].astype(str) + " - " + harga_tanah_max['Harga Tanah (m2)'].astype(str)
+
+# Format the 'Harga Tanah (m2)' column with commas and 2 decimal places
+harga_tanah_range['Harga Tanah (m2)'] = harga_tanah_range['Harga Tanah (m2)'].apply(lambda x: f"{float(x.split(' - ')[0]):,.2f} - {float(x.split(' - ')[1]):,.2f}")
+
+# Merge numerical means with the formatted 'Harga Tanah (m2)' range
+cluster_means = pd.merge(numerical_means, harga_tanah_range[['Clusters', 'Harga Tanah (m2)']], on='Clusters')
 
 # Calculate most frequent category for categorical columns
 categorical_modes = df.groupby('Clusters')[categorical_columns].agg(lambda x: x.mode()[0]).reset_index()
 
 # Merge numerical means and categorical modes
-cluster_means = pd.merge(numerical_means, categorical_modes, on='Clusters')
+cluster_means = pd.merge(cluster_means, categorical_modes, on='Clusters')
+
+
 
 layout = dbc.Container([
     dcc.Location(id='url', refresh=False),
@@ -82,7 +102,7 @@ def update_cluster_profile(pathname):
         ])
     ]
     
-    # Create bar graph for numerical columns only
-    fig = px.bar(cluster_means, x='Clusters', y=numerical_columns, barmode='group', title="Mean Values per Cluster")
+    # Create bar graph for numerical columns except 'Harga Tanah (m2)'
+    fig = px.bar(cluster_means, x='Clusters', y=['LT (m2)', 'Lebar Jalan Depan (m)', 'distance_ke_pusatkota'], barmode='group', title="Values per Cluster")
     
-    return dbc.Table(table_header + table_body, bordered=True, hover=True, responsive=True,dark=True), fig
+    return dbc.Table(table_header + table_body, bordered=True, hover=True, responsive=True, dark=True), fig

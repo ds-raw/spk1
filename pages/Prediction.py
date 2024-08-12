@@ -5,12 +5,6 @@ Created on Wed Feb 21 11:51:36 2024
 @author: daffa
 """
 
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Feb  6 23:27:42 2024
-
-@author: daffa
-"""
 from dash import register_page,dash_table,dcc, html, callback
 import pandas as pd 
 import plotly.express as px
@@ -376,15 +370,16 @@ def update_prediction(n_clicks, lt_input, air_label_input, listrik_label_input, 
         kondisi_tapak
     ]
 
-    prediction = make_predictions(loaded_scaler,loaded_model, user_input)
+    # Make predictions
+    formatted_prediction, prediction_per_meter = make_predictions(loaded_scaler, loaded_model, user_input)
+
+    # Calculate total price (Luas Tanah x Harga Tanah per m2)
+    total_price = float(lt_input) * (prediction_per_meter / 1_000_000)  # Convert to Juta Rupiah
 
     return html.Div([
-       
-        html.H4(f"{prediction}")
+        html.H4(f"Harga per m2: {formatted_prediction:,.2f} Rupiah"),
+        html.H4(f"Total Harga: {total_price:,.2f} Juta Rupiah")
     ])
-
-
-
 
 
 def make_predictions(scaler, model, new_data):
@@ -398,43 +393,43 @@ def make_predictions(scaler, model, new_data):
                      'Hak Atas Properti_HP', 'Hak Atas Properti_PPJB', 'Hak Atas Properti_SHGB',
                      'Hak Atas Properti_SHM', 'Hak Atas Properti_SHMSRS ', 'Hak Atas Properti_SIPPT']
     all_features += ['Kota/Kabupaten_Kabupaten Bandung',
-       'Kota/Kabupaten_Kabupaten Bandung Barat',
-       'Kota/Kabupaten_Kabupaten Bekasi',
-        'Kota/Kabupaten_Kabupaten Bogor',
-       'Kota/Kabupaten_Kabupaten Ciamis', 
-    'Kota/Kabupaten_Kabupaten Cianjur',
-       'Kota/Kabupaten_Kabupaten Cirebon', 
-        'Kota/Kabupaten_Kabupaten Garut',
-       'Kota/Kabupaten_Kabupaten Indramayu',
-       'Kota/Kabupaten_Kabupaten Karawang',
-       'Kota/Kabupaten_Kabupaten Kuningan',
-       'Kota/Kabupaten_Kabupaten Majalengka',
-       'Kota/Kabupaten_Kabupaten Pangandaran',
-       'Kota/Kabupaten_Kabupaten Purwakarta',
-       'Kota/Kabupaten_Kabupaten Subang', 
-        'Kota/Kabupaten_Kabupaten Sukabumi',
-       'Kota/Kabupaten_Kabupaten Sumedang',
-       'Kota/Kabupaten_Kabupaten Tasikmalaya', 
-        'Kota/Kabupaten_Kota Bandung',
-       'Kota/Kabupaten_Kota Banjar', 
-        'Kota/Kabupaten_Kota Bekasi',
-       'Kota/Kabupaten_Kota Bogor',
-        'Kota/Kabupaten_Kota Cimahi',
-       'Kota/Kabupaten_Kota Cirebon',
-        'Kota/Kabupaten_Kota Depok',
-       'Kota/Kabupaten_Kota Sukabumi', 
-        'Kota/Kabupaten_Kota Tasikmalaya']
-    all_features += [ 'Bentuk Tapak_Kipas', 
-        'Bentuk Tapak_Letter L', 
-        'Bentuk Tapak_Ngantong',
-       'Bentuk Tapak_Persegi', 
-        'Bentuk Tapak_Persegi Panjang',
-       'Bentuk Tapak_Tidak Beraturan', 
-            'Bentuk Tapak_Trapesium']
+                     'Kota/Kabupaten_Kabupaten Bandung Barat',
+                     'Kota/Kabupaten_Kabupaten Bekasi',
+                     'Kota/Kabupaten_Kabupaten Bogor',
+                     'Kota/Kabupaten_Kabupaten Ciamis',
+                     'Kota/Kabupaten_Kabupaten Cianjur',
+                     'Kota/Kabupaten_Kabupaten Cirebon',
+                     'Kota/Kabupaten_Kabupaten Garut',
+                     'Kota/Kabupaten_Kabupaten Indramayu',
+                     'Kota/Kabupaten_Kabupaten Karawang',
+                     'Kota/Kabupaten_Kabupaten Kuningan',
+                     'Kota/Kabupaten_Kabupaten Majalengka',
+                     'Kota/Kabupaten_Kabupaten Pangandaran',
+                     'Kota/Kabupaten_Kabupaten Purwakarta',
+                     'Kota/Kabupaten_Kabupaten Subang',
+                     'Kota/Kabupaten_Kabupaten Sukabumi',
+                     'Kota/Kabupaten_Kabupaten Sumedang',
+                     'Kota/Kabupaten_Kabupaten Tasikmalaya',
+                     'Kota/Kabupaten_Kota Bandung',
+                     'Kota/Kabupaten_Kota Banjar',
+                     'Kota/Kabupaten_Kota Bekasi',
+                     'Kota/Kabupaten_Kota Bogor',
+                     'Kota/Kabupaten_Kota Cimahi',
+                     'Kota/Kabupaten_Kota Cirebon',
+                     'Kota/Kabupaten_Kota Depok',
+                     'Kota/Kabupaten_Kota Sukabumi',
+                     'Kota/Kabupaten_Kota Tasikmalaya']
+    all_features += ['Bentuk Tapak_Kipas',
+                     'Bentuk Tapak_Letter L',
+                     'Bentuk Tapak_Ngantong',
+                     'Bentuk Tapak_Persegi',
+                     'Bentuk Tapak_Persegi Panjang',
+                     'Bentuk Tapak_Tidak Beraturan',
+                     'Bentuk Tapak_Trapesium']
     all_features += ['Kondisi Wilayah Sekitar_Campuran', 'Kondisi Wilayah Sekitar_Hijau',
                      'Kondisi Wilayah Sekitar_Industri', 'Kondisi Wilayah Sekitar_Komersial',
                      'Kondisi Wilayah Sekitar_Perumahan']
-    all_features += ['Kondisi Tapak_Darat / Kering', 'Kondisi Tapak_Tanah Mentah', 
+    all_features += ['Kondisi Tapak_Darat / Kering', 'Kondisi Tapak_Tanah Mentah',
                      'Kondisi Tapak_Tanah Siap Dikembangkan (Tanah Matang)']
 
     # Initialize input data list with zeros for all features
@@ -460,7 +455,6 @@ def make_predictions(scaler, model, new_data):
 
     # Make predictions using the loaded model
     prediction = model.predict(scaled_input_data)
-    # Format the prediction with commas between numbers
-    formatted_prediction = "{:,.2f} Juta Rupiah".format(prediction[0])
 
-    return formatted_prediction
+    # Return the raw prediction for further calculations
+    return prediction[0], prediction[0]  # Return both raw prediction and formatted prediction
